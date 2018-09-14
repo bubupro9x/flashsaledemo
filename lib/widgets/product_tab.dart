@@ -282,10 +282,34 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   Widget _buildEndOfListIndicator(BuildContext context) {
-    return Row(
-      children: <Widget>[
-
-      ],
+    final grey = Color(0xFFd0d0d0);
+    final background = Color(0xFFf1f1f1);
+    return Container(
+      padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+      color: background,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              margin: EdgeInsets.only(left: 15.0, right: 11.0),
+              height: 1.0,
+              color: grey
+            ),
+          ),
+          Text(
+            "Bạn đã đến cuối danh sách sản phẩm",
+            style: TextStyle(color: grey, fontSize: 15.0),
+          )
+          ,
+          Expanded(
+            child: Container(
+                margin: EdgeInsets.only(left: 11.0, right: 15.0),
+                height: 1.0,
+                color: grey
+            ),
+          )
+        ],
+      ),
     );
   }
 
