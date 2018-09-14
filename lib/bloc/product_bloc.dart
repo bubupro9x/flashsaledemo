@@ -62,8 +62,6 @@ class ProductBloc extends BaseBloc{
   }
 
   void dispose() {
-    _productsController.close();
-    _indexController.close();
   }
 
   void _handleIndexes(List<int> indexList) {
@@ -109,8 +107,6 @@ class ProductBloc extends BaseBloc{
   void _handleFetchInitialEvents() async{
      await loadProduct();
      await loadBanner();
-     print(_products);
-     print(_banner);
 
      _productsModel = ProductsModel(_products, _banner);
      _productsController.add(_productsModel);

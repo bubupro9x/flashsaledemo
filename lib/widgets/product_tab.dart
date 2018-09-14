@@ -32,6 +32,8 @@ class _ProductTabState extends State<ProductTab>
 
   HeaderBloc _headerBloc;
 
+  List<Widget> _cachedPages;
+
   void setTabTitleColor(Color color) {
     setState(() {
       _tabTitleColor = color;
@@ -65,6 +67,8 @@ class _ProductTabState extends State<ProductTab>
               ],
               bottom: PreferredSize(
                 child: Container(
+                  alignment: Alignment.bottomCenter,
+                  width: double.infinity,
                   height: 60.0,
                   color: Colors.white,
                   child: TabBar(
@@ -104,33 +108,38 @@ class _ProductTabState extends State<ProductTab>
     return sessions.slots
         .map(
           (slot) => Tab(
-                  child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('${slot.toTime()}',
-                        style: TextStyle(
-                            fontSize: 14.0, fontWeight: FontWeight.bold)),
-                    Text(
-                      '${slot.title}',
-                      style: TextStyle(
-                          fontSize: 11.0, fontWeight: FontWeight.w300),
-                    )
-                  ],
-                ),
-              )),
+                  child:Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Text('${slot.toTime()}',
+                            style: TextStyle(
+                                fontSize: 14.0, fontWeight: FontWeight.bold)),
+                        Container(height: 4.0),
+                        Text(
+                          '${slot.title}',
+                          style: TextStyle(
+                              fontSize: 12.0, fontWeight: FontWeight.w300),
+                        ),
+                      ],
+                    ),
+                  ),
+              ),
         )
         .toList();
   }
 
   List<Widget> buildTabViews(BuildContext context, DataSession sessions) {
-    final pages = List<Widget>();
-    for (var i = 0; i < sessions.slots.length; i++) {
-      pages.add(BlocProvider<ProductBloc>(
-          bloc: ProductBloc(session: sessions, tabIndex: i),
-          child: ProductPage(session: sessions, tabIndex: i)));
+    if(_cachedPages == null){
+      print("===> Building tab views");
+      _cachedPages = List<Widget>();
+      for (var i = 0; i < sessions.slots.length; i++) {
+        _cachedPages.add(BlocProvider<ProductBloc>(
+            bloc: ProductBloc(session: sessions, tabIndex: i),
+            child: ProductPage(session: sessions, tabIndex: i)));
+      }
     }
-    return pages;
+    return _cachedPages;
   }
 
   bool _colorChanged = false;
@@ -310,6 +319,6 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   Widget buildLoadingIndicator() {
-    return Container(height: 40.0, child: CircularProgressIndicator());
+    return Center(child: CircularProgressIndicator());
   }
 }

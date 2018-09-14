@@ -1,0 +1,8 @@
+
+\.idea/
+
+base_utils/
+
+build/
+
+pubspec\.lock
