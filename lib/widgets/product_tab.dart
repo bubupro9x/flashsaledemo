@@ -32,6 +32,8 @@ class _ProductTabState extends State<ProductTab>
 
   HeaderBloc _headerBloc;
 
+  List<Widget> _cachedPages;
+
   void setTabTitleColor(Color color) {
     setState(() {
       _tabTitleColor = color;
@@ -148,13 +150,16 @@ class _ProductTabState extends State<ProductTab>
   }
 
   List<Widget> buildTabViews(BuildContext context, DataSession sessions) {
-    final pages = List<Widget>();
-    for (var i = 0; i < sessions.slots.length; i++) {
-      pages.add(BlocProvider<ProductBloc>(
-          bloc: ProductBloc(session: sessions, tabIndex: i),
-          child: ProductPage(session: sessions, tabIndex: i)));
+    if(_cachedPages == null){
+      print("===> Building tab views");
+      _cachedPages = List<Widget>();
+      for (var i = 0; i < sessions.slots.length; i++) {
+        _cachedPages.add(BlocProvider<ProductBloc>(
+            bloc: ProductBloc(session: sessions, tabIndex: i),
+            child: ProductPage(session: sessions, tabIndex: i)));
+      }
     }
-    return pages;
+    return _cachedPages;
   }
 
   bool _colorChanged = false;
