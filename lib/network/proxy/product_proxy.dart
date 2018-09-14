@@ -58,7 +58,7 @@ class ProductProxy extends BaseProxy {
         method: Method.GET,
         host: 'https://mapi.sendo.vn',
         path: 'mob/flash-deal/sessions',
-        headers: null,
+        headers: {'Accept': 'application/x-www-form-urlencoded'},
         params: null);
 
     _request.onSuccess = (result) {

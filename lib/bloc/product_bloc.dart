@@ -36,8 +36,6 @@ class ProductBloc extends BaseBloc{
 
   ProductsModel _productsModel;
 
-  BannerItem _banner;
-
   List<Product> _products;
 
   DataSession _dataSession;
@@ -46,9 +44,12 @@ class ProductBloc extends BaseBloc{
 
   var _page = 1;
 
-  ProductBloc({DataSession session, int tabIndex, ValueNotifier<int> curTabIndex}) {
-    this._dataSession = session;
-    this._tabIndex = tabIndex;
+  Observable<BannerItem> _banner;
+
+  ProductBloc({DataSession session, int tabIndex, ValueNotifier<int> curTabIndex, Observable<BannerItem> banner}) {
+    _dataSession = session;
+    _tabIndex = tabIndex;
+    _banner = banner;
 
     _indexController
       ..bufferTime(Duration(milliseconds: 500))
@@ -93,19 +94,6 @@ class ProductBloc extends BaseBloc{
     }
   }
 
-  Future<dynamic> loadBanner() async {
-    DataRequest<BannerItem> dataRequest = DataRequest();
-    dataRequest.onSuccess = (itemBanner) {
-      _banner = itemBanner;
-      print('ahihi minh in dc ne');
-    };
-
-    dataRequest.onFailure = (error) {
-      print('Load Category Groups fail! $error');
-    };
-    return _productProxy.fetchBanner(dataRequest);
-  }
-
   Future<dynamic> loadProduct() async {
     DataRequest<List<Product>> dataRequest = DataRequest();
     dataRequest.onSuccess = (itemProduct) {
@@ -122,7 +110,6 @@ class ProductBloc extends BaseBloc{
   void _handleFetchInitialProducts() async{
     print("Fetching inital products for page $_tabIndex");
      await loadProduct();
-     await loadBanner();
 
      _productsModel = ProductsModel(_products, _banner);
      _productsController.add(_productsModel);
@@ -161,14 +148,14 @@ class ProductBloc extends BaseBloc{
 
 class ProductsModel {
   List<Product> products;
-  
-  BannerItem banner;
+
+  Observable<BannerItem> banner;
   
   var _streamClosed = false;
 
   ProductsModel(this.products, this.banner);
 
-  int get length => (products!=null?products.length:0) + 2 + (_streamClosed?0:1);
+  int get length => (products!=null?products.length:0) + 3;
   
   Product getProduct(int index) {
     if(isCountdownTimer(index) || isBanner(index)){
@@ -181,9 +168,9 @@ class ProductsModel {
   
   bool isBanner(int index) => index == 1;
 
-  String get bannerUrl => banner.menuItems[0].banners[0];
-  
-  bool isLoadingIndicator(int index) => index == ((products!=null?products.length:0) + 2);
+  bool isLoadingIndicator(int index) => isEndOfList(index) && !_streamClosed;
+
+  bool isEndOfList(int index) => index == ((products!=null?products.length:0) + 2);
 
   void addMoreProducts(List<Product> moreProducts){
     products.addAll(moreProducts);

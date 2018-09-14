@@ -18,6 +18,7 @@ import 'package:flashsaledemo/widgets/list_product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_advanced_networkimage/flutter_advanced_networkimage.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ProductTab extends StatefulWidget {
   @override
@@ -161,7 +162,7 @@ class _ProductTabState extends State<ProductTab>
 
       for (var i = 0; i < sessions.slots.length; i++) {
         _cachedPages.add(BlocProvider<ProductBloc>(
-            bloc: ProductBloc(session: sessions, tabIndex: i, curTabIndex: _headerBloc.curTabIndex),
+            bloc: ProductBloc(session: sessions, tabIndex: i, curTabIndex: _headerBloc.curTabIndex, banner: _headerBloc.banner),
             child: ProductPage(session: sessions, tabIndex: i)));
       }
     }
@@ -240,10 +241,13 @@ class _ProductPageState extends State<ProductPage> {
                             return Container();
                           }
                           if (model.isBanner(index)) {
-                            //return buildBanner(model.bannerUrl);
-                            return Container(height: 44.0);
-                          } else if (model.isLoadingIndicator(index)) {
-                            return buildLoadingIndicator();
+                            return buildBanner(model.banner);
+                          } else if (model.isEndOfList(index)) {
+                            if(model.isLoadingIndicator(index)){
+                              return buildLoadingIndicator();
+                            } else {
+                              return _buildEndOfListIndicator(context);
+                            }
                           } else {
                             return ListProduct(item: model.getProduct(index));
                           }
@@ -298,14 +302,44 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  Widget buildBanner(String url) {
-    final image = AdvancedNetworkImage(
-      url,
-      useDiskCache: true,
-      //useMemoryCache: false,
+  Widget _buildEndOfListIndicator(BuildContext context) {
+    return new Container(
+      color: new Color.fromARGB(225, 241, 241, 241),
+      child: new Container(
+        margin: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(10.0),
+        decoration:
+        new BoxDecoration(border: new Border.all(color: Colors.black12)),
+        child: new Text(
+          "Bạn đã đến cuối danh sách sản phẩm",
+          style: TextStyle(fontWeight: FontWeight.w300),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
+  }
 
-    return Image(image: image, fit: BoxFit.cover);
+  Widget buildBanner(Observable<BannerItem> banner) {
+    return StreamBuilder<BannerItem>(
+      stream: banner,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if(snapshot.data != null){
+          final image = AdvancedNetworkImage(
+            snapshot.data.menuItems[0].banners[0],
+            useDiskCache: true,
+          );
+
+          return Image(image: image, fit: BoxFit.cover);
+        } else {
+          return Container(
+            height: 0.0,
+            color: Colors.grey
+          );
+        }
+
+      },
+
+    );
   }
 
   Widget buildLoadingIndicator() {

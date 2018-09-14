@@ -1,5 +1,8 @@
 
+import 'dart:async';
+
 import 'package:flashsaledemo/bloc/base_bloc.dart';
+import 'package:flashsaledemo/model/menu_item.dart';
 import 'package:flashsaledemo/model/session_item.dart';
 import 'package:flashsaledemo/network/proxy/http_utils.dart';
 import 'package:flashsaledemo/network/proxy/product_proxy.dart';
@@ -16,30 +19,57 @@ class HeaderBloc extends BaseBloc{
 
   final _sessionController = PublishSubject<DataSession>();
 
+  final _bannerController = BehaviorSubject<BannerItem>();
+
   ValueNotifier<int> curTabIndex;
 
   Observable<DataSession> get sessions => _sessionController.stream;
 
+  Observable<BannerItem> get banner => _bannerController.stream;
+
+  BannerItem _cachedBanner;
+
   HeaderBloc(){
     curTabIndex = ValueNotifier(0);
 
-    _sessionController.onListen = (){
+    _sessionController.onListen = () async {
       loadSessions();
+    };
+
+    _bannerController.onListen = (){
+      loadBanner();
     };
   }
 
   @override
   void dispose() {
     _sessionController.close();
+    _bannerController.close();
   }
 
   void loadSessions() {
     DataRequest<DataSession> request = DataRequest<DataSession>();
+
     request.onSuccess = (data){
       addSession(data);
     };
 
     _productProxy.fetchSessions(request);
+  }
+
+  Future<dynamic> loadBanner() async {
+    print("Loading banner");
+    DataRequest<BannerItem> dataRequest = DataRequest();
+    dataRequest.onSuccess = (itemBanner) {
+      print("Banner loaded");
+      _cachedBanner = itemBanner;
+      _bannerController.add(_cachedBanner);
+    };
+
+    dataRequest.onFailure = (error) {
+      print('Load Category Groups fail! $error');
+    };
+    return await _productProxy.fetchBanner(dataRequest);
   }
 
   void addSession(DataSession data) {
