@@ -217,7 +217,14 @@ class _ProductPageState extends State<ProductPage> {
                         itemBuilder: (context, index) {
                           _productBloc.indexInput.add(index);
                           if (model.isCountdownTimer(index)) {
+<<<<<<< HEAD
+                            return countDownTimer(
+                                widget.session.slots[widget.tabIndex],
+                                widget.session.slots[1].slot,
+                                widget.session);
+=======
                             
+>>>>>>> 3041a53cee7807a6e3c1654704e21b0b18dc6d6b
                           }
                           if (model.isBanner(index)) {
                             return buildBanner(model.banner);

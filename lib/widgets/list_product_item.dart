@@ -281,20 +281,18 @@ class ListProductItemState extends State<ListProductItem> {
   Widget _button() {
     return new GestureDetector(
       onTap: () {},
-      child: new Card(
-        color: Color(0xFFe5101d),
+      child: new Container(
         margin: const EdgeInsets.only(left: 8.0, right: 8.0),
-        child: new Container(
-          padding:
-          EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0, top: 8.0),
-          alignment: Alignment.center,
-          child: new Text(
-            widget.item.buttonText,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12.0,
-              color: Colors.white,
-            ),
+        decoration: widget.tabResource.decoButton,
+        padding:
+        EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0, top: 8.0),
+        alignment: Alignment.center,
+        child: new Text(
+          widget.item.buttonText,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12.0,
+            color: widget.tabResource.textButton,
           ),
         ),
       ),
