@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:core_plugin/helper.dart';
 import 'package:intl/intl.dart';
 
-var sub;
+
 
 class CountDownTimer extends StatefulWidget  {
   CountDownTimer({Key key,
@@ -34,7 +34,7 @@ class CountDownTimer extends StatefulWidget  {
 //ToDo
 class _CountDownTimerState extends State<CountDownTimer>  {
 
-
+  var sub;
 
   List<String> widgetList = ['00', '00', '00'];
 

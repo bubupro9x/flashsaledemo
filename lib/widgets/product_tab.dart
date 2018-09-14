@@ -186,6 +186,7 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   ProductBloc _productBloc;
   HeaderBloc _headerBloc;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   ScrollController _scrollController = new ScrollController();
   double _height = 0.0;
@@ -195,7 +196,6 @@ class _ProductPageState extends State<ProductPage> {
   @override
   void initState() {
     super.initState();
-
     _productBloc = BlocProvider.of<ProductBloc>(context);
   }
 
@@ -211,29 +211,33 @@ class _ProductPageState extends State<ProductPage> {
                 ProductsModel model = snapshot.data;
                 return Stack(
                   children: <Widget>[
-                    ListView.builder(
-                        controller: _scrollController,
-                        itemCount: model.length,
-                        itemBuilder: (context, index) {
-                          _productBloc.indexInput.add(index);
-                          if (model.isCountdownTimer(index)) {
-                            return countDownTimer(
-                                widget.session.slots[widget.tabIndex],
-                                widget.session.slots[1].slot,
-                                widget.session);
-                          }
-                          if (model.isBanner(index)) {
-                            return buildBanner(model.banner);
-                          } else if (model.isEndOfList(index)) {
-                            if(model.isLoadingIndicator(index)){
-                              return buildLoadingIndicator();
-                            } else {
-                              return _buildEndOfListIndicator(context);
+                    RefreshIndicator(
+                      key: _refreshIndicatorKey,
+                      onRefresh: _handleRefresh,
+                      child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: model.length,
+                          itemBuilder: (context, index) {
+                            _productBloc.indexInput.add(index);
+                            if (model.isCountdownTimer(index)) {
+                              return countDownTimer(
+                                  widget.session.slots[widget.tabIndex],
+                                  widget.session.slots[1].slot,
+                                  widget.session);
                             }
-                          } else {
-                            return ListProduct(item: model.getProduct(index), tabResource: widget.tabResource,);
-                          }
-                        }),
+                            if (model.isBanner(index)) {
+                              return buildBanner(model.banner);
+                            } else if (model.isEndOfList(index)) {
+                              if(model.isLoadingIndicator(index)){
+                                return buildLoadingIndicator();
+                              } else {
+                                return _buildEndOfListIndicator(context);
+                              }
+                            } else {
+                              return ListProduct(item: model.getProduct(index), tabResource: widget.tabResource,);
+                            }
+                          }),
+                    ),
                   ],
                 );
               } else {
@@ -341,25 +345,27 @@ class _ProductPageState extends State<ProductPage> {
 
   int checkTab = 0;
 
-  Widget countDownTimer(
-      Slot _slot, String startTimeSlotTwo, DataSession _session) {
+  Widget countDownTimer(Slot _slot, String startTimeSlotTwo, DataSession _session) {
+
     _scrollController.addListener(() {
-      print(_scrollController.offset);
+      //print(_scrollController.offset);
       if (_scrollController.offset < 44.0) {
-        print('sub null');
-        sub = null;
+        //print('sub null');
+        //sub = null;
       }
+
+
     });
+
     Timer(Duration(seconds: 1), () {
       if (checkTab != widget.tabIndex) {
-        sub = null;
+        //sub = null;
         checkTab = widget.tabIndex;
         setState(() {});
       } else {
         if (widget.tabIndex == 0) {
-          print('tab = 0');
-          sub = null;
-          setState(() {});
+          //print('tab = 0');
+          //sub = null;
         }
       }
     });
@@ -384,5 +390,13 @@ class _ProductPageState extends State<ProductPage> {
 
   Widget buildLoadingIndicator() {
     return Center(child: CircularProgressIndicator());
+  }
+
+  Future<Null> _handleRefresh() async {
+    _productBloc.reload();
+
+    await new Future.delayed(new Duration(seconds: 1));
+
+    return null;
   }
 }

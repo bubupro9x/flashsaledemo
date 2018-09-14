@@ -71,7 +71,7 @@ class ProductBloc extends BaseBloc{
     });
 
     //Load immediately if it's the first tab
-    if(tabIndex == 0){
+    if(tabIndex == 0 && _productsModel == null){
       _handleFetchInitialProducts();
     }
 
@@ -142,6 +142,11 @@ class ProductBloc extends BaseBloc{
 
   void _updateButton(List<int> indexes) {
     _scrollUpButtonVisibleController.add(indexes.last >= 5);
+  }
+
+  void reload() {
+    _page =1 ;
+    _handleFetchInitialProducts();
   }
 
 }

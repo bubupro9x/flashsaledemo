@@ -37,7 +37,9 @@ class HeaderBloc extends BaseBloc {
     };
 
     _bannerController.onListen = (){
-      loadBanner();
+      if(_cachedBanner == null){
+        loadBanner();
+      }
     };
   }
 
