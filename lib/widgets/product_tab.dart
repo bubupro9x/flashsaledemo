@@ -133,6 +133,7 @@ class _ProductTabState extends State<ProductTab>
         .map(
           (slot) => Tab(
                   child:Container(
+                    width: 60.0,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
