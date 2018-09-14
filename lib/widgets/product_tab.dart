@@ -61,12 +61,14 @@ class _ProductTabState extends State<ProductTab>
                 IconButton(
                   icon: Icon(Icons.share),
                   onPressed: () {
-//TODO add methodChannel share
+                    //TODO add methodChannel share
                   },
                 )
               ],
               bottom: PreferredSize(
                 child: Container(
+                  alignment: Alignment.bottomCenter,
+                  width: double.infinity,
                   height: 60.0,
                   color: Colors.white,
                   child: TabBar(
@@ -130,21 +132,23 @@ class _ProductTabState extends State<ProductTab>
     return sessions.slots
         .map(
           (slot) => Tab(
-                  child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('${slot.toTime()}',
-                        style: TextStyle(
-                            fontSize: 14.0, fontWeight: FontWeight.bold)),
-                    Text(
-                      '${slot.title}',
-                      style: TextStyle(
-                          fontSize: 11.0, fontWeight: FontWeight.w300),
-                    )
-                  ],
-                ),
-              )),
+                  child:Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Text('${slot.toTime()}',
+                            style: TextStyle(
+                                fontSize: 14.0, fontWeight: FontWeight.bold)),
+                        Container(height: 4.0),
+                        Text(
+                          '${slot.title}',
+                          style: TextStyle(
+                              fontSize: 12.0, fontWeight: FontWeight.w300),
+                        ),
+                      ],
+                    ),
+                  ),
+              ),
         )
         .toList();
   }
@@ -311,6 +315,6 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   Widget buildLoadingIndicator() {
-    return Container(height: 40.0, child: CircularProgressIndicator());
+    return Center(child: CircularProgressIndicator());
   }
 }
