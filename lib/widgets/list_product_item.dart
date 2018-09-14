@@ -1,4 +1,5 @@
 import 'package:flashsaledemo/model/product_item_new.dart';
+import 'package:flashsaledemo/res/tab_resource.dart';
 import 'package:flashsaledemo/widgets/product_list_item/fire_in_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_networkimage/flutter_advanced_networkimage.dart';
@@ -7,8 +8,9 @@ import 'package:intl/intl.dart';
 
 class ListProductItem extends StatefulWidget {
   final Product item;
+  final TabResource tabResource;
 
-  ListProductItem({Key key, this.item}) : super(key: key);
+  ListProductItem({Key key, this.item, this.tabResource}) : super(key: key);
 
   @override
   ListProductItemState createState() => new ListProductItemState();
@@ -16,6 +18,7 @@ class ListProductItem extends StatefulWidget {
 
 class ListProductItemState extends State<ListProductItem> {
   var refreshKey = GlobalKey<RefreshIndicatorState>();
+
 
   @override
   void initState() {
@@ -26,12 +29,12 @@ class ListProductItemState extends State<ListProductItem> {
   Widget build(BuildContext context) {
     return Container(
         child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        buildImage(),
-        _itemDescription(widget.item),
-      ],
-    ));
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            buildImage(),
+            _itemDescription(widget.item),
+          ],
+        ));
   }
 
   Widget buildImage() {
@@ -66,7 +69,6 @@ class ListProductItemState extends State<ListProductItem> {
   }
 
   Widget icImageSale(String percent) {
-
     // Will print error messages to the console.
     final String assetName = 'images/sale2x.png';
     final Widget img = new Image.asset(
@@ -120,32 +122,15 @@ class ListProductItemState extends State<ListProductItem> {
 
             item.shoptype == 2
                 ? Stack(
-                    children: <Widget>[
-//                SvgPicture.asset(
-//                  "images/senmall.svg",
-//                  package: 'flashsale',
-//                  width: 33.0,
-//                  height: 33.0,
-//                ),
-                      Container(
-                        margin: EdgeInsets.only(left: 40.0),
-                        child: Text(
-                          item.name,
-                          maxLines: 2,
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: -0.4,
-                            color: Colors.black,
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-                : Text(
+              children: <Widget>[
+                SvgPicture.asset(
+                  "images/senmall.svg",
+                  width: 33.0,
+                  height: 23.0,
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 40.0),
+                  child: Text(
                     item.name,
                     maxLines: 2,
                     softWrap: true,
@@ -158,46 +143,62 @@ class ListProductItemState extends State<ListProductItem> {
                       color: Colors.black,
                     ),
                   ),
+                )
+              ],
+            )
+                : Text(
+              item.name,
+              maxLines: 2,
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 14.0,
+                fontWeight: FontWeight.w400,
+                letterSpacing: -0.4,
+                color: Colors.black,
+              ),
+            ),
 
             //Price Product
             isVisibleSale
                 ? new Text(
-                    '${formatCurrency.format(item.finalPrice)} Đ',
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 14.0,
-                      fontStyle: FontStyle.normal,
-                      letterSpacing: -0.4,
-                      color: Color.fromRGBO(229, 16, 29, 1.0),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
+              '${formatCurrency.format(item.finalPrice)} Đ',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 14.0,
+                fontStyle: FontStyle.normal,
+                letterSpacing: -0.4,
+                color: widget.tabResource.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            )
                 : new Text(
-                    '${formatCurrency.format(item.price)} Đ',
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.normal,
-                      decoration: TextDecoration.lineThrough,
-                      letterSpacing: -0.3,
-                      color: Color.fromRGBO(68, 68, 68, 1.0),
-                    ),
-                  ),
+              '${formatCurrency.format(item.price)} Đ',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 11.0,
+                fontWeight: FontWeight.normal,
+                decoration: TextDecoration.lineThrough,
+                letterSpacing: -0.3,
+                color: Color.fromRGBO(68, 68, 68, 1.0),
+              ),
+            ),
 
             //Price Product Sale
             isVisibleSale
                 ? new Container()
                 : new Text(
-                    '${formatCurrency.format(item.finalPrice)} Đ',
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 16.0,
-                      fontStyle: FontStyle.normal,
-                      letterSpacing: -0.4,
-                      color: Color.fromRGBO(229, 16, 29, 1.0),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              '${formatCurrency.format(item.finalPrice)} Đ',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 16.0,
+                fontStyle: FontStyle.normal,
+                letterSpacing: -0.4,
+                color: widget.tabResource.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
 
             //Group Buy Now
             new Container(
@@ -269,9 +270,10 @@ class ListProductItemState extends State<ListProductItem> {
 
     return new Expanded(
       child: new FireInProgressBar(
-        title: _title,
-        percent: percent,
-        item: widget.item,
+          title: _title,
+          percent: percent,
+          item: widget.item,
+          tabResource: widget.tabResource,
       ),
     );
   }
@@ -284,7 +286,7 @@ class ListProductItemState extends State<ListProductItem> {
         margin: const EdgeInsets.only(left: 8.0, right: 8.0),
         child: new Container(
           padding:
-              EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0, top: 8.0),
+          EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0, top: 8.0),
           alignment: Alignment.center,
           child: new Text(
             widget.item.buttonText,

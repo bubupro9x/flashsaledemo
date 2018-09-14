@@ -13,6 +13,7 @@ import 'package:flashsaledemo/model/session_item.dart';
 import 'package:flashsaledemo/network/proxy/http_utils.dart';
 import 'package:flashsaledemo/res/colors.dart';
 import 'package:flashsaledemo/res/strings.dart';
+import 'package:flashsaledemo/res/tab_resource.dart';
 import 'package:flashsaledemo/widgets/count_down_timer.dart';
 import 'package:flashsaledemo/widgets/list_product.dart';
 import 'package:flutter/material.dart';
@@ -108,35 +109,35 @@ class _ProductTabState extends State<ProductTab>
     return sessions.slots
         .map(
           (slot) => Tab(
-                  child:Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text('${slot.toTime()}',
-                            style: TextStyle(
-                                fontSize: 14.0, fontWeight: FontWeight.bold)),
-                        Container(height: 4.0),
-                        Text(
-                          '${slot.title}',
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text('${slot.toTime()}',
                           style: TextStyle(
-                              fontSize: 12.0, fontWeight: FontWeight.w300),
-                        ),
-                      ],
-                    ),
+                              fontSize: 14.0, fontWeight: FontWeight.bold)),
+                      Container(height: 4.0),
+                      Text(
+                        '${slot.title}',
+                        style: TextStyle(
+                            fontSize: 12.0, fontWeight: FontWeight.w300),
+                      ),
+                    ],
                   ),
+                ),
               ),
         )
         .toList();
   }
 
   List<Widget> buildTabViews(BuildContext context, DataSession sessions) {
-    if(_cachedPages == null){
+    if (_cachedPages == null) {
       print("===> Building tab views");
       _cachedPages = List<Widget>();
       for (var i = 0; i < sessions.slots.length; i++) {
         _cachedPages.add(BlocProvider<ProductBloc>(
             bloc: ProductBloc(session: sessions, tabIndex: i),
-            child: ProductPage(session: sessions, tabIndex: i)));
+            child: ProductPage(session: sessions, tabIndex: i,tabResource: i!=0?OtherTabResource():SellingTabResource(),)));
       }
     }
     return _cachedPages;
@@ -153,35 +154,36 @@ class _ProductTabState extends State<ProductTab>
       _headerBloc.curTabIndex.value = _tabController.index;
     });*/
 
-//    _tabController.animation.addListener(() {
-//      if (_tabController.animation.value !=
-//          _tabController.animation.value.roundToDouble()) {
-//        if (!_colorChanged) {
-//          setTabTitleColor(Colors.black);
-//          _colorChanged = true;
-//        }
-//        print("Animation: moving");
-//      } else {
-//        setTabTitleColor(_tabController.index == 0
-//            ? CustomColors.onSaleTabTitle
-//            : CustomColors.upcomingTabTitle);
-//        _colorChanged = false;
-//        print("Animation: completed");
-//      }
-//
-//      /*if(_tabController.index != _tabController.previousIndex){
-//        setTabTitleColor(_tabController.index ==  0 ? CustomColors.red: Colors.green);
-//      } else {
-//        setTabTitleColor(Colors.grey);
-//      }*/
-//    });
+    _tabController.animation.addListener(() {
+      if (_tabController.animation.value !=
+          _tabController.animation.value.roundToDouble()) {
+        if (!_colorChanged) {
+          setTabTitleColor(Colors.black);
+          _colorChanged = true;
+        }
+        print("Animation: moving");
+      } else {
+        setTabTitleColor(_tabController.index == 0
+            ? CustomColors.onSaleTabTitle
+            : CustomColors.upcomingTabTitle);
+        _colorChanged = false;
+        print("Animation: completed");
+      }
+
+      /*if(_tabController.index != _tabController.previousIndex){
+        setTabTitleColor(_tabController.index ==  0 ? CustomColors.red: Colors.green);
+      } else {
+        setTabTitleColor(Colors.grey);
+      }*/
+    });
   }
 }
 
 class ProductPage extends StatefulWidget {
-  ProductPage({Key key, this.session, this.tabIndex}) : super(key: key);
+  ProductPage({Key key, this.session, this.tabIndex,this.tabResource}) : super(key: key);
   final DataSession session;
   final int tabIndex;
+  final TabResource tabResource;
 
   @override
   _ProductPageState createState() => new _ProductPageState();
@@ -194,14 +196,7 @@ class _ProductPageState extends State<ProductPage> {
   @override
   void initState() {
     super.initState();
-    _controll.addListener((){
-      if(_controll.offset>=44.0){
-        sub=null;
-//        setState(() {
-//
-//        });
-      }
-    });
+
     _productBloc = BlocProvider.of<ProductBloc>(context);
   }
 
@@ -221,19 +216,20 @@ class _ProductPageState extends State<ProductPage> {
                     itemBuilder: (context, index) {
                       _productBloc.indexInput.add(index);
                       if (model.isCountdownTimer(index)) {
-                        return
-                          countDownTimer(
+                        return countDownTimer(
                             widget.session.slots[widget.tabIndex],
                             widget.session.slots[1].slot,
                             widget.session);
                       }
                       if (model.isBanner(index)) {
-                        //return buildBanner(model.bannerUrl);
+
+//                        print('model banner ${model.bannerUrl}');
                         return Container(height: 44.0);
+//                        return Container(height: 44.0);
                       } else if (model.isLoadingIndicator(index)) {
                         return buildLoadingIndicator();
                       } else {
-                        return ListProduct(item: model.getProduct(index));
+                        return ListProduct(item: model.getProduct(index),tabResource: widget.tabResource);
                       }
                     });
               } else {
@@ -294,15 +290,34 @@ class _ProductPageState extends State<ProductPage> {
     return Image(image: image, fit: BoxFit.cover);
   }
 
+  int checkTab = 0;
+
   Widget countDownTimer(
       Slot _slot, String startTimeSlotTwo, DataSession _session) {
-    if (sub != null) {
-//      sub.cancel();
-      sub = null;
-    }
+    _controll.addListener(() {
+      print(_controll.offset);
+      if (_controll.offset < 44.0) {
+        print('sub null');
+        sub = null;
+      }
+    });
+    Timer(Duration(seconds: 1), () {
+      if (checkTab != widget.tabIndex) {
+//        sub.cancel();
+        sub = null;
+        checkTab = widget.tabIndex;
+        setState(() {});
+      } else {
+        if (widget.tabIndex == 0) {
+          print('tab = 0');
+          sub = null;
+          setState(() {});
+        }
+      }
+    });
     var now = DateTime.now();
     Container wid = new Container(
-      color: Colors.grey[300],
+      color: Colors.grey[200],
       height: 44.0,
       child: new CountDownTimer(
         height: 44.0,

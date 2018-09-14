@@ -43,7 +43,7 @@ class _CountDownTimerState extends State<CountDownTimer>  {
   @override
   void dispose() {
     super.dispose();
-//    sub.cancel();
+    sub.cancel();
   }
 
   @override
@@ -68,8 +68,10 @@ class _CountDownTimerState extends State<CountDownTimer>  {
     super.didUpdateWidget(oldWidget);
   }
 
+
   void createCountDown(Duration d) {
     if (sub == null) {
+
       CountDown cd = new CountDown(
         d,
         refresh: new Duration(seconds: 1),
