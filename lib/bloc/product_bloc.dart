@@ -8,6 +8,7 @@ import 'package:flashsaledemo/model/product_item_new.dart';
 import 'package:flashsaledemo/model/session_item.dart';
 import 'package:flashsaledemo/model/status.dart';
 import 'package:flashsaledemo/network/proxy/http_utils.dart';
+import 'package:flutter/src/foundation/change_notifier.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:math';
 
@@ -45,7 +46,7 @@ class ProductBloc extends BaseBloc{
 
   var _page = 1;
 
-  ProductBloc({DataSession session, int tabIndex}) {
+  ProductBloc({DataSession session, int tabIndex, ValueNotifier<int> curTabIndex}) {
     this._dataSession = session;
     this._tabIndex = tabIndex;
 
@@ -58,7 +59,21 @@ class ProductBloc extends BaseBloc{
         _updateButton(index);
       });
 
-    _handleFetchInitialEvents();
+    curTabIndex.addListener((){
+      print("Tab changed to ${curTabIndex.value}");
+      if(curTabIndex.value == _tabIndex
+          && !_productsController.isClosed
+          && _productsModel == null){
+        print("Loading products");
+        _handleFetchInitialProducts();
+      }
+    });
+
+    //Load immediately if it's the first tab
+    if(tabIndex == 0){
+      _handleFetchInitialProducts();
+    }
+
   }
 
   void dispose() {
@@ -104,7 +119,8 @@ class ProductBloc extends BaseBloc{
         dataRequest, _dataSession.slots[_tabIndex].slot, _page);
   }
 
-  void _handleFetchInitialEvents() async{
+  void _handleFetchInitialProducts() async{
+    print("Fetching inital products for page $_tabIndex");
      await loadProduct();
      await loadBanner();
 
@@ -140,6 +156,7 @@ class ProductBloc extends BaseBloc{
   void _updateButton(List<int> indexes) {
     _scrollUpButtonVisibleController.add(indexes.last >= 5);
   }
+
 }
 
 class ProductsModel {

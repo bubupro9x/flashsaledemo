@@ -156,11 +156,12 @@ class _ProductTabState extends State<ProductTab>
 
   List<Widget> buildTabViews(BuildContext context, DataSession sessions) {
     if(_cachedPages == null){
-      print("===> Building tab views");
       _cachedPages = List<Widget>();
+      _headerBloc = BlocProvider.of<HeaderBloc>(context);
+
       for (var i = 0; i < sessions.slots.length; i++) {
         _cachedPages.add(BlocProvider<ProductBloc>(
-            bloc: ProductBloc(session: sessions, tabIndex: i),
+            bloc: ProductBloc(session: sessions, tabIndex: i, curTabIndex: _headerBloc.curTabIndex),
             child: ProductPage(session: sessions, tabIndex: i)));
       }
     }
@@ -172,11 +173,9 @@ class _ProductTabState extends State<ProductTab>
   void initController() {
     _tabController = new TabController(vsync: this, length: 20);
 
-/*_tabController.addListener((){
-      print("Tab settled");
-      setTabTitleColor(_tabController.index ==  0 ? CustomColors.onSaleTabTitle: CustomColors.upcomingTabTitle);
-      _headerBloc.curTabIndex.value = _tabController.index;
-    });*/
+    _tabController.addListener((){
+          _headerBloc.curTabIndex.value = _tabController.index;
+        });
 
     _tabController.animation.addListener(() {
       if (_tabController.animation.value !=
@@ -185,20 +184,13 @@ class _ProductTabState extends State<ProductTab>
           setTabTitleColor(Colors.black);
           _colorChanged = true;
         }
-        print("Animation: moving");
       } else {
         setTabTitleColor(_tabController.index == 0
             ? CustomColors.onSaleTabTitle
             : CustomColors.upcomingTabTitle);
         _colorChanged = false;
-        print("Animation: completed");
       }
 
-/*if(_tabController.index != _tabController.previousIndex){
-        setTabTitleColor(_tabController.index ==  0 ? CustomColors.red: Colors.green);
-      } else {
-        setTabTitleColor(Colors.grey);
-      }*/
     });
   }
 }
@@ -214,6 +206,8 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   ProductBloc _productBloc;
+  HeaderBloc _headerBloc;
+
   ScrollController _scrollController = new ScrollController();
   double _height = 0.0;
   GlobalKey _keyTopHeader, _keyHeader;
@@ -254,7 +248,6 @@ class _ProductPageState extends State<ProductPage> {
                             return ListProduct(item: model.getProduct(index));
                           }
                         }),
-                   
                   ],
                 );
               } else {
