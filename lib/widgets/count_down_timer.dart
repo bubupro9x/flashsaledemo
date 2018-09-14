@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 var sub;
 
-class CountDownTimer extends StatefulWidget {
+class CountDownTimer extends StatefulWidget  {
   CountDownTimer({Key key,
     this.height,
     this.slots,
@@ -29,7 +29,10 @@ class CountDownTimer extends StatefulWidget {
 }
 
 //ToDo
-class _CountDownTimerState extends State<CountDownTimer> {
+class _CountDownTimerState extends State<CountDownTimer>  {
+
+
+
   List<String> widgetList = ['00', '00', '00'];
 
   @override
@@ -65,8 +68,10 @@ class _CountDownTimerState extends State<CountDownTimer> {
     super.didUpdateWidget(oldWidget);
   }
 
+
   void createCountDown(Duration d) {
     if (sub == null) {
+
       CountDown cd = new CountDown(
         d,
         refresh: new Duration(seconds: 1),
@@ -233,4 +238,5 @@ class _CountDownTimerState extends State<CountDownTimer> {
       ),
     );
   }
+
 }

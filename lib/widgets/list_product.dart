@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:flashsaledemo/model/product_item_new.dart';
+import 'package:flashsaledemo/res/tab_resource.dart';
 import 'package:flashsaledemo/widgets/dialog.dart';
 import 'package:flashsaledemo/widgets/list_product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-
 class ListProduct extends StatefulWidget {
   final Product item;
-
-  ListProduct({Key key, this.item}) : super(key: key);
+  final TabResource tabResource;
+  ListProduct({Key key, this.item, this.tabResource}) : super(key: key);
 
   @override
   ListProductState createState() => new ListProductState();
@@ -35,30 +35,29 @@ class ListProductState extends State<ListProduct> {
                 height: 145.0,
                 child: ListProductItem(
                   item: widget.item,
+                    tabResource: widget.tabResource
                 )),
             itemDivider(),
           ],
         ),
         widget.item.productDisplay != "burn"
-            ? Container(
-
-        )
+            ? Container()
             : Stack(
-          children: <Widget>[
-            Opacity(
-              opacity: 0.4,
-              child: Container(
-                margin: EdgeInsets.only(top:13.0),
-                height: 145.0,
-                color: Colors.grey,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(35.0),
-              child: Image.asset('images/icon_b_n_h_t.png'),
-            )
-          ],
-        )
+                children: <Widget>[
+                  Opacity(
+                    opacity: 0.4,
+                    child: Container(
+                      margin: EdgeInsets.only(top: 13.0),
+                      height: 145.0,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(35.0),
+                    child: Image.asset('images/icon_b_n_h_t.png'),
+                  )
+                ],
+              )
       ],
     );
   }
@@ -86,13 +85,4 @@ class ListProductState extends State<ListProduct> {
     );
   }
 
-  void showDialogSapBan(BuildContext context) {
-    DialogAlert.instance = DialogAlert.internal(
-      title: "",
-      description: "Sản phẩm chưa đến giờ bán. \nXin vui lòng quay lại sau",
-      image: "images/sapban.png",
-      closeDialogCallBack: () => {},
-    );
-    DialogAlert.instance.showAlert(context);
-  }
 }

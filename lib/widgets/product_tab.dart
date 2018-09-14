@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:base_utils/system/theme_utils.dart';
 import 'package:flashsaledemo/arch/injector.dart';
-import 'package:rect_getter/rect_getter.dart';
+
 import 'package:flashsaledemo/bloc/bloc_providers.dart';
 import 'package:flashsaledemo/bloc/product_bloc.dart';
 import 'package:flashsaledemo/bloc/product_header_bloc.dart';
@@ -13,6 +13,7 @@ import 'package:flashsaledemo/model/session_item.dart';
 import 'package:flashsaledemo/network/proxy/http_utils.dart';
 import 'package:flashsaledemo/res/colors.dart';
 import 'package:flashsaledemo/res/strings.dart';
+import 'package:flashsaledemo/res/tab_resource.dart';
 import 'package:flashsaledemo/widgets/count_down_timer.dart';
 import 'package:flashsaledemo/widgets/list_product.dart';
 import 'package:flutter/material.dart';
@@ -99,30 +100,6 @@ class _ProductTabState extends State<ProductTab>
     );
   }
 
-  Widget countDownTimer(
-      Slot _slot, String startTimeSlotTwo, DataSession _session) {
-    if (sub != null) {
-      sub.cancel();
-      sub = null;
-    }
-    var now = DateTime.now();
-    Container wid = new Container(
-      color: Colors.grey[300],
-      height: 44.0,
-      child:  CountDownTimer(
-        height: 44.0 ,
-        slots: _slot,
-        startTime: now,
-        session: _session,
-        onDoneTimer: () {
-//          showDialog(item);
-        },
-      ));
-
-
-    return wid;
-  }
-
   @override
   void dispose() {
     _tabController.dispose();
@@ -145,11 +122,16 @@ class _ProductTabState extends State<ProductTab>
                         Text(
                           '${slot.title}',
                           style: TextStyle(
-                              fontSize: 12.0, fontWeight: FontWeight.w300),
-                        ),
-                      ],
-                    ),
+                              fontSize: 14.0, fontWeight: FontWeight.bold)),
+                      Container(height: 4.0),
+                      Text(
+                        '${slot.title}',
+                        style: TextStyle(
+                            fontSize: 12.0, fontWeight: FontWeight.w300),
+                      ),
+                    ],
                   ),
+                ),
               ),
         )
         .toList();
@@ -197,9 +179,10 @@ class _ProductTabState extends State<ProductTab>
 }
 
 class ProductPage extends StatefulWidget {
-  ProductPage({Key key, this.session, this.tabIndex}) : super(key: key);
+  ProductPage({Key key, this.session, this.tabIndex,this.tabResource}) : super(key: key);
   final DataSession session;
   final int tabIndex;
+  final TabResource tabResource;
 
   @override
   _ProductPageState createState() => new _ProductPageState();
@@ -217,6 +200,7 @@ class _ProductPageState extends State<ProductPage> {
   @override
   void initState() {
     super.initState();
+
     _productBloc = BlocProvider.of<ProductBloc>(context);
   }
 
@@ -340,6 +324,49 @@ class _ProductPageState extends State<ProductPage> {
       },
 
     );
+  }
+
+  int checkTab = 0;
+
+  Widget countDownTimer(
+      Slot _slot, String startTimeSlotTwo, DataSession _session) {
+    _controll.addListener(() {
+      print(_controll.offset);
+      if (_controll.offset < 44.0) {
+        print('sub null');
+        sub = null;
+      }
+    });
+    Timer(Duration(seconds: 1), () {
+      if (checkTab != widget.tabIndex) {
+//        sub.cancel();
+        sub = null;
+        checkTab = widget.tabIndex;
+        setState(() {});
+      } else {
+        if (widget.tabIndex == 0) {
+          print('tab = 0');
+          sub = null;
+          setState(() {});
+        }
+      }
+    });
+    var now = DateTime.now();
+    Container wid = new Container(
+      color: Colors.grey[200],
+      height: 44.0,
+      child: new CountDownTimer(
+        height: 44.0,
+        slots: _slot,
+        startTime: now,
+        session: _session,
+        onDoneTimer: () {
+//          showDialog(item);
+        },
+      ),
+    );
+
+    return wid;
   }
 
   Widget buildLoadingIndicator() {

@@ -1,11 +1,12 @@
-
 import 'package:flashsaledemo/model/product_item_new.dart';
+import 'package:flashsaledemo/res/tab_resource.dart';
 import 'package:flutter/material.dart';
 
 class FireInProgressBar extends StatefulWidget {
-  FireInProgressBar({Key key, this.percent, this.title,this.item})
+  FireInProgressBar(
+      {Key key, this.percent, this.title, this.item, this.tabResource})
       : super(key: key);
-
+  final TabResource tabResource;
   final double percent;
   final String title;
   Product item;
@@ -49,7 +50,7 @@ class _FireInProgressBar extends State<FireInProgressBar> {
     return new Container(
       margin: edge,
       decoration: BoxDecoration(
-        color: Color(0xFFFBC999),
+        color: widget.tabResource.statusBackgroundColor,
         borderRadius: new BorderRadius.all(const Radius.circular(15.0)),
       ),
     );
@@ -62,13 +63,12 @@ class _FireInProgressBar extends State<FireInProgressBar> {
           builder: (BuildContext context, BoxConstraints constraints) {
         Color colorContainer = Color(0xFFD43D3D);
         if (widget.percent <= 0.2) {
-          if (widget.percent!=0.0){
-            _percent = widget.percent+0.1;
-            colorContainer = Color(0xFFD43D3D);
+          if (widget.percent != 0.0) {
+            _percent = widget.percent + 0.1;
           }
-          colorContainer = Color(0xFFD43D3D); //Red
+          colorContainer = widget.tabResource.tabTitleColor; //Red
         } else {
-          colorContainer = Color(0xFFF47900); //Organ
+          colorContainer = widget.tabResource.statusEndColor; //Organ
         }
 
         if (widget.item.productDisplay == 'burn') {
@@ -81,7 +81,9 @@ class _FireInProgressBar extends State<FireInProgressBar> {
             color: colorContainer,
             borderRadius: new BorderRadius.all(const Radius.circular(15.0)),
           ),
-          width: widget.percent<=0.2?constraints.maxWidth *_percent:constraints.maxWidth * widget.percent,
+          width: widget.percent <= 0.2
+              ? constraints.maxWidth * _percent
+              : constraints.maxWidth * widget.percent,
         );
       }),
     );
@@ -100,21 +102,24 @@ class _FireInProgressBar extends State<FireInProgressBar> {
   }
 
   Widget _imageBurn() {
-    return new Container(
-      width: 24.0,
-      height: 36.0,
-      decoration: new BoxDecoration(
-        image: new DecorationImage(
-          fit: BoxFit.cover,
-          image: new AssetImage(
-            widget.item.productDisplay == 'burn'
-                ? "images/cu-san-deal-grey.png"
-                : "images/cu-san-deal.png",
-          ),
-        ),
-        borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+    return ((widget.item.quantity - widget.item.remain) *
+                100 /
+                widget.item.quantity) >=
+            80.0
+        ? Container(
+            width: 24.0,
+            height: 36.0,
+            decoration: new BoxDecoration(
+              image: new DecorationImage(
+                fit: BoxFit.cover,
+                image: new AssetImage(
+                  "images/cu-san-deal-grey.png",
+                ),
+              ),
+              borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
 //        color: new ColorFi
-      ),
-    );
+            ),
+          )
+        : Container();
   }
 }
