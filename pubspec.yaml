@@ -59,6 +59,8 @@ flutter:
       - images/senmall.svg
       - images/sale2x.png
       - images/icon_b_n_h_t.png
+      - images/sale_green.png
+      - images/sale_red.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

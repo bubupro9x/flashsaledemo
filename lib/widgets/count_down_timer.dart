@@ -1,6 +1,7 @@
 import 'package:flashsaledemo/model/product_item_new.dart';
 import 'package:flashsaledemo/model/session_item.dart';
 import 'package:flashsaledemo/network/proxy/session_proxy.dart';
+import 'package:flashsaledemo/res/tab_resource.dart';
 import 'package:flashsaledemo/widgets/countdown_base.dart';
 import 'package:flutter/material.dart';
 import 'package:core_plugin/helper.dart';
@@ -12,6 +13,7 @@ class CountDownTimer extends StatefulWidget  {
   CountDownTimer({Key key,
     this.height,
     this.slots,
+    this.tabResource,
     this.startTime,
     this.onDoneTimer,
     this.startTimeSlotTwo,
@@ -23,6 +25,7 @@ class CountDownTimer extends StatefulWidget  {
   final String startTimeSlotTwo;
   final DataSession session;
   final double height;
+  final TabResource tabResource;
 
   @override
   _CountDownTimerState createState() => new _CountDownTimerState();
@@ -187,14 +190,14 @@ class _CountDownTimerState extends State<CountDownTimer>  {
             width: 25.0,
             height: 20.0,
             decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.9),
+                color: widget.tabResource.primaryColor,
                 borderRadius: BorderRadius.circular(4.0)),
             child: Center(
               child: new Text(
                 value,
                 style: new TextStyle(
                     fontSize: 13.0,
-                    color: Color(0xFFf5a623),
+                    color: Colors.white,
                     fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
               ),
@@ -223,10 +226,10 @@ class _CountDownTimerState extends State<CountDownTimer>  {
         DateTime
             .parse(widget.slots.slot)
             .millisecondsSinceEpoch) {
-      strTitle = 'Bắt đầu trong';
+      strTitle = 'BẮT ĐẦU TRONG';
     } else {
       //selling
-      strTitle = 'Kết thúc trong';
+      strTitle = 'KẾT THÚC ';
     }
 
     return new Container(

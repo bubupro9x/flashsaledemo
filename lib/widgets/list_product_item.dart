@@ -70,7 +70,7 @@ class ListProductItemState extends State<ListProductItem> {
 
   Widget icImageSale(String percent) {
     // Will print error messages to the console.
-    final String assetName = 'images/sale2x.png';
+    final String assetName = widget.tabResource.imgSale;
     final Widget img = new Image.asset(
       assetName,
       width: 37.0,
@@ -82,7 +82,7 @@ class ListProductItemState extends State<ListProductItem> {
           img,
           new Positioned(
             top: 4.0,
-            left: 3.0,
+            left: 3.3,
             right: 0.0,
             child: Text(
               '${double.tryParse(percent).ceil()}%',
@@ -288,7 +288,7 @@ class ListProductItemState extends State<ListProductItem> {
         EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0, top: 8.0),
         alignment: Alignment.center,
         child: new Text(
-          widget.item.buttonText,
+          widget.item.buttonText.toString()[0].toUpperCase()+widget.item.buttonText.toString().substring(1),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 12.0,

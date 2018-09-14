@@ -18,6 +18,8 @@ abstract class TabResource {
   BoxDecoration get decoButton;
 
   Color get textButton;
+
+  String get imgSale;
 }
 
 class OtherTabResource extends TabResource {
@@ -43,6 +45,9 @@ class OtherTabResource extends TabResource {
   bool get hasHotDeal => false;
 
   @override
+  String get imgSale => 'images/sale_green.png';
+
+  @override
   BoxDecoration get decoButton => BoxDecoration(
       color: Colors.white,
       border: Border.all(color: Colors.green),
@@ -55,6 +60,9 @@ class OtherTabResource extends TabResource {
 class SellingTabResource extends TabResource {
   @override
   String get discountImagePath => "images/selling_discount_background.png";
+
+  @override
+  String get imgSale => 'images/sale_red.png';
 
   @override
   Color get primaryColor => const Color(0xFFe5101d);

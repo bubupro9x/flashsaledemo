@@ -352,7 +352,6 @@ class _ProductPageState extends State<ProductPage> {
     });
     Timer(Duration(seconds: 1), () {
       if (checkTab != widget.tabIndex) {
-//        sub.cancel();
         sub = null;
         checkTab = widget.tabIndex;
         setState(() {});
@@ -371,6 +370,7 @@ class _ProductPageState extends State<ProductPage> {
       child: new CountDownTimer(
         height: 44.0,
         slots: _slot,
+        tabResource: widget.tabResource,
         startTime: now,
         session: _session,
         onDoneTimer: () {
