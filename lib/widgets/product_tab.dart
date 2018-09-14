@@ -193,38 +193,29 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   ProductBloc _productBloc;
   HeaderBloc _headerBloc;
+  static const TO_TOP_BUTTON_VISIBLE_THRESHOLD = 700.0;
 
+  static const TO_TOP_BUTTON_ANIMATION_THRESHOLD = 1500.0;
   ScrollController _scrollController = new ScrollController();
-  double _height = 0.0;
-  GlobalKey _keyTopHeader, _keyHeader;
-  var _isHeader = false;
   bool isShowScrollToTop = false;
 
   @override
   void initState() {
     super.initState();
+
     _scrollController.addListener(() {
       if (_scrollController.offset < 44.0) {
         print('sub null');
         sub = null;
       }
-      if (_scrollController.position.extentBefore > 1000) {
-        if (isShowScrollToTop == false) {
-          setState(() {
-            print('isShowScrollToTop ${isShowScrollToTop}');
-            isShowScrollToTop = true;
-          });
-        }
+      if (_scrollController.offset >= TO_TOP_BUTTON_VISIBLE_THRESHOLD) {
+        _productBloc.scrollUpButtonInput.add(true);
       } else {
-        if (isShowScrollToTop) {
-          setState(() {
-            print('isShowScrollToTop ${isShowScrollToTop}');
-            isShowScrollToTop = false;
-          });
-        }
+        _productBloc.scrollUpButtonInput.add(false);
       }
     });
     _productBloc = BlocProvider.of<ProductBloc>(context);
+
   }
 
   @override
@@ -265,32 +256,49 @@ class _ProductPageState extends State<ProductPage> {
                             );
                           }
                         }),
-                    !isShowScrollToTop
-                        ? new Container()
-                        : new Align(
-                            alignment: FractionalOffset.bottomRight,
-                            child: new Container(
-                              padding: const EdgeInsets.only(
-                                  bottom: 40.0,
-                                  left: 2.0,
-                                  right: 2.0,
-                                  top: 2.0),
-                              child: FloatingActionButton(
-                                child: Icon(Icons.arrow_upward),
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.red,
-                                onPressed: () {
-                                  _scrollController.jumpTo(0.0);
-                                },
-                              ),
-                            ),
-                          ),
+                    Positioned(right: 12.0, bottom: 47.0,child: buildScrollUpButton()),
                   ],
                 );
               } else {
                 return emptyProduct(context);
               }
             }));
+  }
+
+  Widget buildScrollUpButton() {
+    return StreamBuilder<bool>(
+        initialData: false,
+        stream: _productBloc.scrollUpButtonVisible,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          return AnimatedOpacity(
+              opacity: (snapshot.data != null && snapshot.data) ? 1.0 : 0.0,
+              duration: Duration(milliseconds: 200),
+              child: Material(
+                elevation: 4.0,
+                shape: CircleBorder(),
+                color: Colors.transparent,
+                child: Ink.image(
+                  image: AssetImage('images/ic_to_top.png'),
+                  fit: BoxFit.cover,
+                  width: 45.0,
+                  height: 45.0,
+                  child: InkWell(
+                      onTap: () {
+                        if (_scrollController.offset <= TO_TOP_BUTTON_ANIMATION_THRESHOLD) {
+                          _scrollController.animateTo(0.0,
+                              duration: Duration(milliseconds: 400),
+                              curve: Curves.easeIn);
+                        } else {
+                          _scrollController.jumpTo(0.0);
+                        }
+
+                        _productBloc.scrollUpButtonInput.add(false);
+                      },
+                      child: null
+                  ),
+                ),
+              ));
+        });
   }
 
   Widget emptyProduct(BuildContext context) {

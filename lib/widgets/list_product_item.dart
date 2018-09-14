@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_advanced_networkimage/flutter_advanced_networkimage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:flashsaledemo/sendo/common/native_methods.dart';
 
 class ListProductItem extends StatefulWidget {
   final Product item;
@@ -280,7 +281,7 @@ class ListProductItemState extends State<ListProductItem> {
 
   Widget _button() {
     return new GestureDetector(
-      onTap: () {},
+      onTap: () { actionDeepLinkSendo(url: widget.item.urlKey);},
       child: new Container(
         margin: const EdgeInsets.only(left: 8.0, right: 8.0),
         decoration: widget.tabResource.decoButton,
