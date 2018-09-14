@@ -6,6 +6,7 @@ import 'package:flashsaledemo/widgets/list_product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+
 class ListProduct extends StatefulWidget {
   final Product item;
 

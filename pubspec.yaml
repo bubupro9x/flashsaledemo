@@ -24,6 +24,7 @@ dependencies:
   core_plugin: ^0.0.4
   flutter_advanced_networkimage: any
   flutter_svg: ^0.5.1
+  rect_getter: ^0.0.1
   base_utils:
     path: base_utils/
 

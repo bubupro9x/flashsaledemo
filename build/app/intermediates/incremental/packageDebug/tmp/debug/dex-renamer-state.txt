@@ -1,4 +1,0 @@
-#Fri Sep 14 09:09:57 ICT 2018
-base.0=/Users/apple/senpay/flashsalegit/build/app/intermediates/transforms/dexMerger/debug/0
-path.0=classes.dex
-renamed.0=classes.dex
