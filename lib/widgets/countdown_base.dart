@@ -59,10 +59,10 @@ class CountDown {
   _onCancel() {
 //    print('count time dang _onCancel');
     // on pause we already cancel the _timer
-    if (!isPaused) {
-      _timer.cancel();
-      _timer = null;
-    }
+//    if (!isPaused) {
+//      _timer.cancel();
+//      _timer = null;
+//    }
     // _controller.close(); // close automatically the "pipe" when the sub close it by sub.cancel()
   }
 

@@ -1,15 +1,14 @@
-
 import 'package:flashsaledemo/bloc/base_bloc.dart';
 import 'package:flashsaledemo/model/session_item.dart';
 import 'package:flashsaledemo/network/proxy/http_utils.dart';
 import 'package:flashsaledemo/network/proxy/product_proxy.dart';
 import 'package:flashsaledemo/res/strings.dart';
+import 'package:flashsaledemo/widgets/count_down_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
-class HeaderBloc extends BaseBloc{
-
+class HeaderBloc extends BaseBloc {
   DataSession _cachedSessions;
 
   final _productProxy = ProductProxy.initial();
@@ -20,10 +19,10 @@ class HeaderBloc extends BaseBloc{
 
   Observable<DataSession> get sessions => _sessionController.stream;
 
-  HeaderBloc(){
+  HeaderBloc() {
     curTabIndex = ValueNotifier(0);
 
-    _sessionController.onListen = (){
+    _sessionController.onListen = () {
       loadSessions();
     };
   }
@@ -35,7 +34,7 @@ class HeaderBloc extends BaseBloc{
 
   void loadSessions() {
     DataRequest<DataSession> request = DataRequest<DataSession>();
-    request.onSuccess = (data){
+    request.onSuccess = (data) {
       addSession(data);
     };
 
@@ -48,9 +47,11 @@ class HeaderBloc extends BaseBloc{
     _sessionController.add(_cachedSessions);
   }
 
+
+
   void _findTitleForSessions(DataSession sessions) {
-    sessions.slots.forEach((slot){
-      if(sessions.slots.first == slot){
+    sessions.slots.forEach((slot) {
+      if (sessions.slots.first == slot) {
         slot.title = Strings.slotOnSale;
         return;
       }
@@ -61,11 +62,11 @@ class HeaderBloc extends BaseBloc{
 
       Duration interval = slotTime.difference(currentTime);
 
-      if(interval < Duration(days: 1)){
+      if (interval < Duration(days: 1)) {
         slot.title = Strings.slotUpcoming;
-      } else if(interval < Duration(days: 2)){
+      } else if (interval < Duration(days: 2)) {
         slot.title = Strings.slotTomorrow;
-      } else if(interval < Duration(days: 3)) {
+      } else if (interval < Duration(days: 3)) {
         slot.title = Strings.slotDayAfterTomorrow;
       } else {
         slot.title = Strings.slotDayMonth(slotTime.day, slotTime.month);
@@ -76,5 +77,4 @@ class HeaderBloc extends BaseBloc{
   DateTime getDateOnly(DateTime currentTime) {
     return DateTime(currentTime.year, currentTime.month, currentTime.day);
   }
-
 }

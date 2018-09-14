@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:base_utils/system/theme_utils.dart';
 import 'package:flashsaledemo/arch/injector.dart';
-import 'package:rect_getter/rect_getter.dart';
+
 import 'package:flashsaledemo/bloc/bloc_providers.dart';
 import 'package:flashsaledemo/bloc/product_bloc.dart';
 import 'package:flashsaledemo/bloc/product_header_bloc.dart';
@@ -59,7 +59,7 @@ class _ProductTabState extends State<ProductTab>
                 IconButton(
                   icon: Icon(Icons.share),
                   onPressed: () {
-//TODO add methodChannel share
+                    //TODO add methodChannel share
                   },
                 )
               ],
@@ -92,30 +92,6 @@ class _ProductTabState extends State<ProductTab>
         }
       },
     );
-  }
-
-  Widget countDownTimer(
-      Slot _slot, String startTimeSlotTwo, DataSession _session) {
-    if (sub != null) {
-      sub.cancel();
-      sub = null;
-    }
-    var now = DateTime.now();
-    Container wid = new Container(
-      color: Colors.grey[300],
-      height: 44.0,
-      child:  CountDownTimer(
-        height: 44.0 ,
-        slots: _slot,
-        startTime: now,
-        session: _session,
-        onDoneTimer: () {
-//          showDialog(item);
-        },
-      ));
-
-
-    return wid;
   }
 
   @override
@@ -162,34 +138,34 @@ class _ProductTabState extends State<ProductTab>
   void initController() {
     _tabController = new TabController(vsync: this, length: 20);
 
-/*_tabController.addListener((){
+    /*_tabController.addListener((){
       print("Tab settled");
       setTabTitleColor(_tabController.index ==  0 ? CustomColors.onSaleTabTitle: CustomColors.upcomingTabTitle);
       _headerBloc.curTabIndex.value = _tabController.index;
     });*/
 
-    _tabController.animation.addListener(() {
-      if (_tabController.animation.value !=
-          _tabController.animation.value.roundToDouble()) {
-        if (!_colorChanged) {
-          setTabTitleColor(Colors.black);
-          _colorChanged = true;
-        }
-        print("Animation: moving");
-      } else {
-        setTabTitleColor(_tabController.index == 0
-            ? CustomColors.onSaleTabTitle
-            : CustomColors.upcomingTabTitle);
-        _colorChanged = false;
-        print("Animation: completed");
-      }
-
-/*if(_tabController.index != _tabController.previousIndex){
-        setTabTitleColor(_tabController.index ==  0 ? CustomColors.red: Colors.green);
-      } else {
-        setTabTitleColor(Colors.grey);
-      }*/
-    });
+//    _tabController.animation.addListener(() {
+//      if (_tabController.animation.value !=
+//          _tabController.animation.value.roundToDouble()) {
+//        if (!_colorChanged) {
+//          setTabTitleColor(Colors.black);
+//          _colorChanged = true;
+//        }
+//        print("Animation: moving");
+//      } else {
+//        setTabTitleColor(_tabController.index == 0
+//            ? CustomColors.onSaleTabTitle
+//            : CustomColors.upcomingTabTitle);
+//        _colorChanged = false;
+//        print("Animation: completed");
+//      }
+//
+//      /*if(_tabController.index != _tabController.previousIndex){
+//        setTabTitleColor(_tabController.index ==  0 ? CustomColors.red: Colors.green);
+//      } else {
+//        setTabTitleColor(Colors.grey);
+//      }*/
+//    });
   }
 }
 
@@ -204,14 +180,19 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   ProductBloc _productBloc;
-  ScrollController _scrollController = new ScrollController();
-  double _height = 0.0;
-  GlobalKey _keyTopHeader, _keyHeader;
-  var _isHeader = false;
+  ScrollController _controll = new ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _controll.addListener((){
+      if(_controll.offset>=44.0){
+        sub=null;
+//        setState(() {
+//
+//        });
+      }
+    });
     _productBloc = BlocProvider.of<ProductBloc>(context);
   }
 
@@ -225,28 +206,27 @@ class _ProductPageState extends State<ProductPage> {
             builder: (context, snapshot) {
               if (snapshot.data != null) {
                 ProductsModel model = snapshot.data;
-                return Stack(
-                  children: <Widget>[
-                    ListView.builder(
-                        controller: _scrollController,
-                        itemCount: model.length,
-                        itemBuilder: (context, index) {
-                          _productBloc.indexInput.add(index);
-                          if (model.isCountdownTimer(index)) {
-                            return Container();
-                          }
-                          if (model.isBanner(index)) {
-                            //return buildBanner(model.bannerUrl);
-                            return Container(height: 44.0);
-                          } else if (model.isLoadingIndicator(index)) {
-                            return buildLoadingIndicator();
-                          } else {
-                            return ListProduct(item: model.getProduct(index));
-                          }
-                        }),
-                   
-                  ],
-                );
+                return ListView.builder(
+                    controller: _controll,
+                    itemCount: model.length,
+                    itemBuilder: (context, index) {
+                      _productBloc.indexInput.add(index);
+                      if (model.isCountdownTimer(index)) {
+                        return
+                          countDownTimer(
+                            widget.session.slots[widget.tabIndex],
+                            widget.session.slots[1].slot,
+                            widget.session);
+                      }
+                      if (model.isBanner(index)) {
+                        //return buildBanner(model.bannerUrl);
+                        return Container(height: 44.0);
+                      } else if (model.isLoadingIndicator(index)) {
+                        return buildLoadingIndicator();
+                      } else {
+                        return ListProduct(item: model.getProduct(index));
+                      }
+                    });
               } else {
                 return emptyProduct(context);
               }
@@ -303,6 +283,30 @@ class _ProductPageState extends State<ProductPage> {
     );
 
     return Image(image: image, fit: BoxFit.cover);
+  }
+
+  Widget countDownTimer(
+      Slot _slot, String startTimeSlotTwo, DataSession _session) {
+    if (sub != null) {
+//      sub.cancel();
+      sub = null;
+    }
+    var now = DateTime.now();
+    Container wid = new Container(
+      color: Colors.grey[300],
+      height: 44.0,
+      child: new CountDownTimer(
+        height: 44.0,
+        slots: _slot,
+        startTime: now,
+        session: _session,
+        onDoneTimer: () {
+//          showDialog(item);
+        },
+      ),
+    );
+
+    return wid;
   }
 
   Widget buildLoadingIndicator() {
