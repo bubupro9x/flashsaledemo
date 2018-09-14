@@ -110,17 +110,16 @@ class _ProductTabState extends State<ProductTab>
     return sessions.slots
         .map(
           (slot) => Tab(
-                  child:Container(
-                    width: 60.0,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text('${slot.toTime()}',
-                            style: TextStyle(
-                                fontSize: 14.0, fontWeight: FontWeight.bold)),
-                        Container(height: 4.0),
-                        Text(
-                          '${slot.title}',
+                child: Container(
+                  width: 60.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text('${slot.toTime()}',
+                          style: TextStyle(
+                              fontSize: 14.0, fontWeight: FontWeight.bold)),
+                      Container(height: 4.0),
+                      Text('${slot.title}',
                           style: TextStyle(
                               fontSize: 12.0, fontWeight: FontWeight.w300)),
                       Container(height: 4.0),
@@ -133,14 +132,22 @@ class _ProductTabState extends State<ProductTab>
   }
 
   List<Widget> buildTabViews(BuildContext context, DataSession sessions) {
-    if(_cachedPages == null){
+    if (_cachedPages == null) {
       _cachedPages = List<Widget>();
       _headerBloc = BlocProvider.of<HeaderBloc>(context);
 
       for (var i = 0; i < sessions.slots.length; i++) {
         _cachedPages.add(BlocProvider<ProductBloc>(
-            bloc: ProductBloc(session: sessions, tabIndex: i, curTabIndex: _headerBloc.curTabIndex, banner: _headerBloc.banner),
-            child: ProductPage(session: sessions, tabIndex: i, tabResource: i==0?SellingTabResource():OtherTabResource(),)));
+            bloc: ProductBloc(
+                session: sessions,
+                tabIndex: i,
+                curTabIndex: _headerBloc.curTabIndex,
+                banner: _headerBloc.banner),
+            child: ProductPage(
+              session: sessions,
+              tabIndex: i,
+              tabResource: i == 0 ? SellingTabResource() : OtherTabResource(),
+            )));
       }
     }
     return _cachedPages;
@@ -151,9 +158,9 @@ class _ProductTabState extends State<ProductTab>
   void initController() {
     _tabController = new TabController(vsync: this, length: 20);
 
-    _tabController.addListener((){
-          _headerBloc.curTabIndex.value = _tabController.index;
-        });
+    _tabController.addListener(() {
+      _headerBloc.curTabIndex.value = _tabController.index;
+    });
 
     _tabController.animation.addListener(() {
       if (_tabController.animation.value !=
@@ -168,13 +175,13 @@ class _ProductTabState extends State<ProductTab>
             : CustomColors.upcomingTabTitle);
         _colorChanged = false;
       }
-
     });
   }
 }
 
 class ProductPage extends StatefulWidget {
-  ProductPage({Key key, this.session, this.tabIndex,this.tabResource}) : super(key: key);
+  ProductPage({Key key, this.session, this.tabIndex, this.tabResource})
+      : super(key: key);
   final DataSession session;
   final int tabIndex;
   final TabResource tabResource;
@@ -191,11 +198,32 @@ class _ProductPageState extends State<ProductPage> {
   double _height = 0.0;
   GlobalKey _keyTopHeader, _keyHeader;
   var _isHeader = false;
+  bool isShowScrollToTop = false;
 
   @override
   void initState() {
     super.initState();
-
+    _scrollController.addListener(() {
+      if (_scrollController.offset < 44.0) {
+        print('sub null');
+        sub = null;
+      }
+      if (_scrollController.position.extentBefore > 1000) {
+        if (isShowScrollToTop == false) {
+          setState(() {
+            print('isShowScrollToTop ${isShowScrollToTop}');
+            isShowScrollToTop = true;
+          });
+        }
+      } else {
+        if (isShowScrollToTop) {
+          setState(() {
+            print('isShowScrollToTop ${isShowScrollToTop}');
+            isShowScrollToTop = false;
+          });
+        }
+      }
+    });
     _productBloc = BlocProvider.of<ProductBloc>(context);
   }
 
@@ -225,15 +253,38 @@ class _ProductPageState extends State<ProductPage> {
                           if (model.isBanner(index)) {
                             return buildBanner(model.banner);
                           } else if (model.isEndOfList(index)) {
-                            if(model.isLoadingIndicator(index)){
+                            if (model.isLoadingIndicator(index)) {
                               return buildLoadingIndicator();
                             } else {
                               return _buildEndOfListIndicator(context);
                             }
                           } else {
-                            return ListProduct(item: model.getProduct(index), tabResource: widget.tabResource,);
+                            return ListProduct(
+                              item: model.getProduct(index),
+                              tabResource: widget.tabResource,
+                            );
                           }
                         }),
+                    !isShowScrollToTop
+                        ? new Container()
+                        : new Align(
+                            alignment: FractionalOffset.bottomRight,
+                            child: new Container(
+                              padding: const EdgeInsets.only(
+                                  bottom: 40.0,
+                                  left: 2.0,
+                                  right: 2.0,
+                                  top: 2.0),
+                              child: FloatingActionButton(
+                                child: Icon(Icons.arrow_upward),
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.red,
+                                onPressed: () {
+                                  _scrollController.jumpTo(0.0);
+                                },
+                              ),
+                            ),
+                          ),
                   ],
                 );
               } else {
@@ -294,22 +345,19 @@ class _ProductPageState extends State<ProductPage> {
         children: <Widget>[
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(left: 15.0, right: 11.0),
-              height: 1.0,
-              color: grey
-            ),
+                margin: EdgeInsets.only(left: 15.0, right: 11.0),
+                height: 1.0,
+                color: grey),
           ),
           Text(
             "Bạn đã đến cuối danh sách sản phẩm",
             style: TextStyle(color: grey, fontSize: 15.0),
-          )
-          ,
+          ),
           Expanded(
             child: Container(
                 margin: EdgeInsets.only(left: 11.0, right: 15.0),
                 height: 1.0,
-                color: grey
-            ),
+                color: grey),
           )
         ],
       ),
@@ -320,7 +368,7 @@ class _ProductPageState extends State<ProductPage> {
     return StreamBuilder<BannerItem>(
       stream: banner,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if(snapshot.data != null){
+        if (snapshot.data != null) {
           final image = AdvancedNetworkImage(
             snapshot.data.menuItems[0].banners[0],
             useDiskCache: true,
@@ -328,14 +376,9 @@ class _ProductPageState extends State<ProductPage> {
 
           return Image(image: image, fit: BoxFit.cover);
         } else {
-          return Container(
-            height: 0.0,
-            color: Colors.grey
-          );
+          return Container(height: 0.0, color: Colors.grey);
         }
-
       },
-
     );
   }
 
@@ -343,13 +386,6 @@ class _ProductPageState extends State<ProductPage> {
 
   Widget countDownTimer(
       Slot _slot, String startTimeSlotTwo, DataSession _session) {
-    _scrollController.addListener(() {
-      print(_scrollController.offset);
-      if (_scrollController.offset < 44.0) {
-        print('sub null');
-        sub = null;
-      }
-    });
     Timer(Duration(seconds: 1), () {
       if (checkTab != widget.tabIndex) {
         sub = null;
