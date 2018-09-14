@@ -141,7 +141,7 @@ class ProductBloc extends BaseBloc{
   }
 
   void _updateButton(List<int> indexes) {
-    _scrollUpButtonVisibleController.add(indexes.last >= 5);
+    _scrollUpButtonVisibleController.add(indexes.last >= 7);
   }
 
   void reload() {

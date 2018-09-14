@@ -110,17 +110,16 @@ class _ProductTabState extends State<ProductTab>
     return sessions.slots
         .map(
           (slot) => Tab(
-                  child:Container(
-                    width: 60.0,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text('${slot.toTime()}',
-                            style: TextStyle(
-                                fontSize: 14.0, fontWeight: FontWeight.bold)),
-                        Container(height: 4.0),
-                        Text(
-                          '${slot.title}',
+                child: Container(
+                  width: 60.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text('${slot.toTime()}',
+                          style: TextStyle(
+                              fontSize: 14.0, fontWeight: FontWeight.bold)),
+                      Container(height: 4.0),
+                      Text('${slot.title}',
                           style: TextStyle(
                               fontSize: 12.0, fontWeight: FontWeight.w300)),
                       Container(height: 4.0),
@@ -133,14 +132,22 @@ class _ProductTabState extends State<ProductTab>
   }
 
   List<Widget> buildTabViews(BuildContext context, DataSession sessions) {
-    if(_cachedPages == null){
+    if (_cachedPages == null) {
       _cachedPages = List<Widget>();
       _headerBloc = BlocProvider.of<HeaderBloc>(context);
 
       for (var i = 0; i < sessions.slots.length; i++) {
         _cachedPages.add(BlocProvider<ProductBloc>(
-            bloc: ProductBloc(session: sessions, tabIndex: i, curTabIndex: _headerBloc.curTabIndex, banner: _headerBloc.banner),
-            child: ProductPage(session: sessions, tabIndex: i, tabResource: i==0?SellingTabResource():OtherTabResource(),)));
+            bloc: ProductBloc(
+                session: sessions,
+                tabIndex: i,
+                curTabIndex: _headerBloc.curTabIndex,
+                banner: _headerBloc.banner),
+            child: ProductPage(
+              session: sessions,
+              tabIndex: i,
+              tabResource: i == 0 ? SellingTabResource() : OtherTabResource(),
+            )));
       }
     }
     return _cachedPages;
@@ -151,9 +158,9 @@ class _ProductTabState extends State<ProductTab>
   void initController() {
     _tabController = new TabController(vsync: this, length: 20);
 
-    _tabController.addListener((){
-          _headerBloc.curTabIndex.value = _tabController.index;
-        });
+    _tabController.addListener(() {
+      _headerBloc.curTabIndex.value = _tabController.index;
+    });
 
     _tabController.animation.addListener(() {
       if (_tabController.animation.value !=
@@ -168,13 +175,13 @@ class _ProductTabState extends State<ProductTab>
             : CustomColors.upcomingTabTitle);
         _colorChanged = false;
       }
-
     });
   }
 }
 
 class ProductPage extends StatefulWidget {
-  ProductPage({Key key, this.session, this.tabIndex,this.tabResource}) : super(key: key);
+  ProductPage({Key key, this.session, this.tabIndex, this.tabResource})
+      : super(key: key);
   final DataSession session;
   final int tabIndex;
   final TabResource tabResource;
@@ -186,17 +193,25 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   ProductBloc _productBloc;
   HeaderBloc _headerBloc;
+  static const TO_TOP_BUTTON_VISIBLE_THRESHOLD = 700.0;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
+  static const TO_TOP_BUTTON_ANIMATION_THRESHOLD = 1500.0;
   ScrollController _scrollController = new ScrollController();
-  double _height = 0.0;
-  GlobalKey _keyTopHeader, _keyHeader;
-  var _isHeader = false;
+  bool isShowScrollToTop = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.offset >= TO_TOP_BUTTON_VISIBLE_THRESHOLD) {
+        _productBloc.scrollUpButtonInput.add(true);
+      } else {
+        _productBloc.scrollUpButtonInput.add(false);
+      }
+    });
     _productBloc = BlocProvider.of<ProductBloc>(context);
+
   }
 
   @override
@@ -236,14 +251,56 @@ class _ProductPageState extends State<ProductPage> {
                             } else {
                               return ListProduct(item: model.getProduct(index), tabResource: widget.tabResource,);
                             }
-                          }),
-                    ),
+                          } else {
+                            return ListProduct(
+                              item: model.getProduct(index),
+                              tabResource: widget.tabResource,
+                            );
+                          }
+                        }),
+                    Positioned(right: 12.0, bottom: 47.0,child: buildScrollUpButton()),
                   ],
                 );
               } else {
                 return emptyProduct(context);
               }
             }));
+  }
+
+  Widget buildScrollUpButton() {
+    return StreamBuilder<bool>(
+        initialData: false,
+        stream: _productBloc.scrollUpButtonVisible,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          return AnimatedOpacity(
+              opacity: (snapshot.data != null && snapshot.data) ? 1.0 : 0.0,
+              duration: Duration(milliseconds: 200),
+              child: Material(
+                elevation: 4.0,
+                shape: CircleBorder(),
+                color: Colors.transparent,
+                child: Ink.image(
+                  image: AssetImage('images/ic_to_top.png'),
+                  fit: BoxFit.cover,
+                  width: 45.0,
+                  height: 45.0,
+                  child: InkWell(
+                      onTap: () {
+                        if (_scrollController.offset <= TO_TOP_BUTTON_ANIMATION_THRESHOLD) {
+                          _scrollController.animateTo(0.0,
+                              duration: Duration(milliseconds: 400),
+                              curve: Curves.easeIn);
+                        } else {
+                          _scrollController.jumpTo(0.0);
+                        }
+
+                        _productBloc.scrollUpButtonInput.add(false);
+                      },
+                      child: null
+                  ),
+                ),
+              ));
+        });
   }
 
   Widget emptyProduct(BuildContext context) {
@@ -298,22 +355,19 @@ class _ProductPageState extends State<ProductPage> {
         children: <Widget>[
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(left: 15.0, right: 11.0),
-              height: 1.0,
-              color: grey
-            ),
+                margin: EdgeInsets.only(left: 15.0, right: 11.0),
+                height: 1.0,
+                color: grey),
           ),
           Text(
             "Bạn đã đến cuối danh sách sản phẩm",
             style: TextStyle(color: grey, fontSize: 15.0),
-          )
-          ,
+          ),
           Expanded(
             child: Container(
                 margin: EdgeInsets.only(left: 11.0, right: 15.0),
                 height: 1.0,
-                color: grey
-            ),
+                color: grey),
           )
         ],
       ),
@@ -324,7 +378,7 @@ class _ProductPageState extends State<ProductPage> {
     return StreamBuilder<BannerItem>(
       stream: banner,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if(snapshot.data != null){
+        if (snapshot.data != null) {
           final image = AdvancedNetworkImage(
             snapshot.data.menuItems[0].banners[0],
             useDiskCache: true,
@@ -332,14 +386,9 @@ class _ProductPageState extends State<ProductPage> {
 
           return Image(image: image, fit: BoxFit.cover);
         } else {
-          return Container(
-            height: 0.0,
-            color: Colors.grey
-          );
+          return Container(height: 0.0, color: Colors.grey);
         }
-
       },
-
     );
   }
 
