@@ -49,7 +49,7 @@ class OtherTabResource extends TabResource {
       borderRadius: BorderRadius.all(Radius.circular(3.0)));
 
   @override
-  Color get textButton => Color(0xff38761d);
+  Color get textButton => const Color(0xff38761d);
 }
 
 class SellingTabResource extends TabResource {
@@ -74,12 +74,10 @@ class SellingTabResource extends TabResource {
   @override
   bool get hasHotDeal => true;
 
-
   @override
   BoxDecoration get decoButton => BoxDecoration(
-      color: Colors.red,
-      borderRadius: BorderRadius.all(Radius.circular(3.0)));
+      color: Colors.red, borderRadius: BorderRadius.all(Radius.circular(3.0)));
 
   @override
-  Color get textButton => Color(0xffffff);
+  Color get textButton => const Color(0xFFffffff);
 }
