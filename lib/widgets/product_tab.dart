@@ -248,16 +248,12 @@ class _ProductPageState extends State<ProductPage> {
                               } else {
                                 return _buildEndOfListIndicator(context);
                               }
-                            } else {
-                              return ListProduct(item: model.getProduct(index), tabResource: widget.tabResource,);
-                            }
-                          } else {
+                            }  else {
                             return ListProduct(
                               item: model.getProduct(index),
-                              tabResource: widget.tabResource,
-                            );
-                          }
-                        }),
+                              tabResource: widget.tabResource,);
+                            }
+                        })),
                     Positioned(right: 12.0, bottom: 47.0,child: buildScrollUpButton()),
                   ],
                 );
