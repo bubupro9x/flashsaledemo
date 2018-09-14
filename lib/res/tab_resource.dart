@@ -14,6 +14,10 @@ abstract class TabResource {
   Color get statusEndColor;
 
   bool get hasHotDeal;
+
+  BoxDecoration get decoButton;
+
+  Color get textButton;
 }
 
 class OtherTabResource extends TabResource {
@@ -37,6 +41,15 @@ class OtherTabResource extends TabResource {
 
   @override
   bool get hasHotDeal => false;
+
+  @override
+  BoxDecoration get decoButton => BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: Colors.green),
+      borderRadius: BorderRadius.all(Radius.circular(3.0)));
+
+  @override
+  Color get textButton => Color(0xff38761d);
 }
 
 class SellingTabResource extends TabResource {
@@ -59,5 +72,14 @@ class SellingTabResource extends TabResource {
   Color get statusStartColor => const Color(0xFFff6a42);
 
   @override
-  bool get hasHotDeal =>true;
+  bool get hasHotDeal => true;
+
+
+  @override
+  BoxDecoration get decoButton => BoxDecoration(
+      color: Colors.red,
+      borderRadius: BorderRadius.all(Radius.circular(3.0)));
+
+  @override
+  Color get textButton => Color(0xffffff);
 }

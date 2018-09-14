@@ -222,7 +222,10 @@ class _ProductPageState extends State<ProductPage> {
                         itemBuilder: (context, index) {
                           _productBloc.indexInput.add(index);
                           if (model.isCountdownTimer(index)) {
-                            return Container();
+                            return countDownTimer(
+                                widget.session.slots[widget.tabIndex],
+                                widget.session.slots[1].slot,
+                                widget.session);
                           }
                           if (model.isBanner(index)) {
                             return buildBanner(model.banner);
@@ -330,9 +333,9 @@ class _ProductPageState extends State<ProductPage> {
 
   Widget countDownTimer(
       Slot _slot, String startTimeSlotTwo, DataSession _session) {
-    _controll.addListener(() {
-      print(_controll.offset);
-      if (_controll.offset < 44.0) {
+    _scrollController.addListener(() {
+      print(_scrollController.offset);
+      if (_scrollController.offset < 44.0) {
         print('sub null');
         sub = null;
       }
