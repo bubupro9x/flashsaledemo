@@ -122,13 +122,8 @@ class _ProductTabState extends State<ProductTab>
                         Text(
                           '${slot.title}',
                           style: TextStyle(
-                              fontSize: 14.0, fontWeight: FontWeight.bold)),
+                              fontSize: 12.0, fontWeight: FontWeight.w300)),
                       Container(height: 4.0),
-                      Text(
-                        '${slot.title}',
-                        style: TextStyle(
-                            fontSize: 12.0, fontWeight: FontWeight.w300),
-                      ),
                     ],
                   ),
                 ),
@@ -145,7 +140,7 @@ class _ProductTabState extends State<ProductTab>
       for (var i = 0; i < sessions.slots.length; i++) {
         _cachedPages.add(BlocProvider<ProductBloc>(
             bloc: ProductBloc(session: sessions, tabIndex: i, curTabIndex: _headerBloc.curTabIndex, banner: _headerBloc.banner),
-            child: ProductPage(session: sessions, tabIndex: i)));
+            child: ProductPage(session: sessions, tabIndex: i, tabResource: SellingTabResource(),)));
       }
     }
     return _cachedPages;
@@ -222,10 +217,14 @@ class _ProductPageState extends State<ProductPage> {
                         itemBuilder: (context, index) {
                           _productBloc.indexInput.add(index);
                           if (model.isCountdownTimer(index)) {
+<<<<<<< HEAD
                             return countDownTimer(
                                 widget.session.slots[widget.tabIndex],
                                 widget.session.slots[1].slot,
                                 widget.session);
+=======
+                            
+>>>>>>> 3041a53cee7807a6e3c1654704e21b0b18dc6d6b
                           }
                           if (model.isBanner(index)) {
                             return buildBanner(model.banner);
@@ -236,7 +235,7 @@ class _ProductPageState extends State<ProductPage> {
                               return _buildEndOfListIndicator(context);
                             }
                           } else {
-                            return ListProduct(item: model.getProduct(index));
+                            return ListProduct(item: model.getProduct(index), tabResource: widget.tabResource,);
                           }
                         }),
                   ],
@@ -290,19 +289,10 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   Widget _buildEndOfListIndicator(BuildContext context) {
-    return new Container(
-      color: new Color.fromARGB(225, 241, 241, 241),
-      child: new Container(
-        margin: const EdgeInsets.all(15.0),
-        padding: const EdgeInsets.all(10.0),
-        decoration:
-        new BoxDecoration(border: new Border.all(color: Colors.black12)),
-        child: new Text(
-          "Bạn đã đến cuối danh sách sản phẩm",
-          style: TextStyle(fontWeight: FontWeight.w300),
-          textAlign: TextAlign.center,
-        ),
-      ),
+    return Row(
+      children: <Widget>[
+
+      ],
     );
   }
 
