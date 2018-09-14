@@ -105,8 +105,9 @@ class _ProductTabState extends State<ProductTab>
   List<Tab> buildTabHeaders(BuildContext context, DataSession sessions) {
     return sessions.slots
         .map(
-          (slot) => Tab(
-                  child: Container(
+          (slot) =>
+          Tab(
+              child: Container(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -121,7 +122,7 @@ class _ProductTabState extends State<ProductTab>
                   ],
                 ),
               )),
-        )
+    )
         .toList();
   }
 
@@ -214,25 +215,30 @@ class _ProductPageState extends State<ProductPage> {
                 ProductsModel model = snapshot.data;
                 return Stack(
                   children: <Widget>[
-                    ListView.builder(
-                        controller: _controll,
-                        itemCount: model.length,
-                        itemBuilder: (context, index) {
-                          _productBloc.indexInput.add(index);
-                          if (model.isCountdownTimer(index)) {
-                            return Container();
-                          }
-                          if (model.isBanner(index)) {
-                            //return buildBanner(model.bannerUrl);
-                            return Container(height: 44.0);
-                          } else if (model.isLoadingIndicator(index)) {
-                            return buildLoadingIndicator();
-                          } else {
-                            return ListProduct(item: model.getProduct(index));
-                          }
-                        }),
                     countDownTimer(widget.session.slots[widget.tabIndex],
-                        widget.session.slots[1].slot, widget.session)
+                        widget.session.slots[1].slot, widget.session),
+                    Container(
+                      margin: EdgeInsets.only(top: 0.0),
+                        child:
+                        ListView.builder(
+                            controller: _controll,
+                            itemCount: model.length,
+                            itemBuilder: (context, index) {
+                              _productBloc.indexInput.add(index);
+                              if (model.isCountdownTimer(index)) {
+                                return Container();
+                              }
+                              if (model.isBanner(index)) {
+                                //return buildBanner(model.bannerUrl);
+                                return Container();
+                              } else if (model.isLoadingIndicator(index)) {
+                                return buildLoadingIndicator();
+                              } else {
+                                return ListProduct(
+                                    item: model.getProduct(index));
+                              }
+                            }),
+                    )
                   ],
                 );
               } else {
@@ -243,7 +249,10 @@ class _ProductPageState extends State<ProductPage> {
 
   Widget emptyProduct(BuildContext context) {
     return new Container(
-      height: MediaQuery.of(context).size.height - 190.0 - 100.0 - 18.0 - 48.0,
+      height: MediaQuery
+          .of(context)
+          .size
+          .height - 190.0 - 100.0 - 18.0 - 48.0,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -293,17 +302,16 @@ class _ProductPageState extends State<ProductPage> {
     return Image(image: image, fit: BoxFit.cover);
   }
 
-  Widget countDownTimer(
-      Slot _slot, String startTimeSlotTwo, DataSession _session) {
+  Widget countDownTimer(Slot _slot, String startTimeSlotTwo,
+      DataSession _session) {
     if (sub != null) {
       sub.cancel();
       sub = null;
     }
     var now = DateTime.now();
     Container wid = new Container(
-      margin: EdgeInsets.only(top: -1.0),
       color: Colors.grey[300],
-      height: 44.0 - _height >= 0 ? 44.0 - _height : 0.0,
+      height: 44.0,
       child: new CountDownTimer(
         height: 44.0 - _height,
         slots: _slot,
